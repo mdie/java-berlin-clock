@@ -53,9 +53,9 @@ public class InjectableInstanceStepsFactory extends InstanceStepsFactory {
     
     private void findFieldTypeInMapAndInjectInstanceIfFound(Field field, Object stepInstance) {
     	Objenesis objenesis = new ObjenesisStd();
-    	Iterator<Class<? extends Object>> iterPropertiesTypes = injectionMap.keySet().iterator();
+    	Iterator<Class<?>> iterPropertiesTypes = injectionMap.keySet().iterator();
     	while (iterPropertiesTypes.hasNext()) {
-			Class<? extends Object> typeOfPropertyToSet = (Class<? extends Object>) iterPropertiesTypes.next();
+			Class<?> typeOfPropertyToSet = (Class<?>) iterPropertiesTypes.next();
 			if (typeOfPropertyToSet.equals(field.getType())) {
 				try {
 					ReflectionUtils.setVariableValueInObject(stepInstance, field.getName(), 
