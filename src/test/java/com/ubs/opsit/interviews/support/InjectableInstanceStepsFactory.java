@@ -14,8 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ubs.opsit.interviews.BerlinClockConverter;
-import com.ubs.opsit.interviews.HelloWorld;
-import com.ubs.opsit.interviews.HelloWorldImpl;
 import com.ubs.opsit.interviews.TimeConverter;
 
 /**
@@ -32,7 +30,6 @@ public class InjectableInstanceStepsFactory extends InstanceStepsFactory {
     
     private final static Map<Class<?>, Class<?>> injectionMap =  new HashMap<Class<?>, Class<?>>();
     static {
-    	injectionMap.put(HelloWorld.class, HelloWorldImpl.class);
     	injectionMap.put(TimeConverter.class, BerlinClockConverter.class);
     }
 
@@ -58,10 +55,12 @@ public class InjectableInstanceStepsFactory extends InstanceStepsFactory {
 			Class<?> typeOfPropertyToSet = (Class<?>) iterPropertiesTypes.next();
 			if (typeOfPropertyToSet.equals(field.getType())) {
 				try {
-					ReflectionUtils.setVariableValueInObject(stepInstance, field.getName(), 
-							objenesis.newInstance(injectionMap.get(typeOfPropertyToSet)));
-					LOG.info(String.format("I have just injected the new instance of %s class into instance (%s) of %s (by setting property %s).", 
-							injectionMap.get(typeOfPropertyToSet), stepInstance, stepInstance.getClass(), field.getName()));
+					if (ReflectionUtils.getValueIncludingSuperclasses(field.getName(), stepInstance) == null) {
+						ReflectionUtils.setVariableValueInObject(stepInstance, field.getName(), 
+								objenesis.newInstance(injectionMap.get(typeOfPropertyToSet)));
+						LOG.info(String.format("I have just injected the new instance of %s class into instance (%s) of %s (by setting property %s).", 
+								injectionMap.get(typeOfPropertyToSet), stepInstance, stepInstance.getClass(), field.getName()));
+					}
 				} catch (IllegalAccessException e) {
 					throw new RuntimeException(e);
 				}
